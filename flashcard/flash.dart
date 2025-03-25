@@ -1,89 +1,101 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(FlashCardApp()); // ✅ Main entry point
+  runApp(FlashcardApp());
 }
 
-// Main App Class
-class FlashCardApp extends StatelessWidget {
+class FlashcardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: FlashCardScreen(), // ✅ Navigates to FlashCardScreen
-      debugShowCheckedModeBanner: false, // ✅ Removes debug banner
+      title: 'Flashcard App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: FlashcardScreen(),
     );
   }
 }
 
-// Stateful Widget for Flashcard Screen
-class FlashCardScreen extends StatefulWidget {
+class FlashcardScreen extends StatefulWidget {
   @override
-  _FlashCardScreenState createState() => _FlashCardScreenState(); // ✅ State creator
+  _FlashcardScreenState createState() => _FlashcardScreenState();
 }
 
-// State Class
-class _FlashCardScreenState extends State<FlashCardScreen> {
-  // List of flashcards
-  List<Map<String, String>> flashcards = [
-    {'question': 'What is the capital of France?', 'answer': 'Paris'},
-    {'question': 'What is 2 + 2?', 'answer': '4'},
-    {'question': 'What is the largest planet?', 'answer': 'Jupiter'},
+class _FlashcardScreenState extends State<FlashcardScreen> {
+  bool _showAnswer = false;
+
+  final List<Map<String, String>> _flashcards = [
+    {"question": "What is Flutter?", "answer": "Flutter is a UI toolkit by Google for building natively compiled applications."},
+    {"question": "What is Dart?", "answer": "Dart is the programming language used by Flutter."},
+    {"question": "What is a widget in Flutter?", "answer": "A widget is a building block of a Flutter app's UI."},
   ];
 
-  int currentIndex = 0; // ✅ Track current card
-  bool showAnswer = false; // ✅ Track whether to show answer or question
+  int _currentIndex = 0;
 
-  // Move to next card
-  void nextCard() {
+  void _toggleAnswer() {
     setState(() {
-      currentIndex = (currentIndex + 1) % flashcards.length; // Loop around
-      showAnswer = false; // Reset to question
+      _showAnswer = !_showAnswer;
     });
   }
 
-  // Flip card to show answer/question
-  void flipCard() {
+  void _nextCard() {
     setState(() {
-      showAnswer = !showAnswer; // Toggle between question and answer
+      _currentIndex = (_currentIndex + 1) % _flashcards.length;
+      _showAnswer = false;
     });
   }
 
-  // Build UI
+  void _previousCard() {
+    setState(() {
+      _currentIndex = (_currentIndex - 1) % _flashcards.length;
+      _showAnswer = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flash Cards'),
-        centerTitle: true,
+        title: Text('Flashcard App'),
       ),
       body: Center(
-        child: GestureDetector(
-          onTap: flipCard, // Tap to flip
-          child: Card(
-            margin: EdgeInsets.all(20),
-            elevation: 8,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Container(
-              width: double.infinity,
-              height: 300,
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(20),
-              child: Text(
-                showAnswer
-                    ? flashcards[currentIndex]['answer']! // Show answer
-                    : flashcards[currentIndex]['question']!, // Show question
-                style: TextStyle(fontSize: 24),
-                textAlign: TextAlign.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Card(
+              elevation: 5,
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Text(
+                  _showAnswer
+                      ? _flashcards[_currentIndex]['answer']!
+                      : _flashcards[_currentIndex]['question']!,
+                  style: TextStyle(fontSize: 24),
+                ),
               ),
             ),
-          ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _toggleAnswer,
+              child: Text(_showAnswer ? 'Hide Answer' : 'Show Answer'),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: _previousCard,
+                  child: Text('Previous'),
+                ),
+                ElevatedButton(
+                  onPressed: _nextCard,
+                  child: Text('Next'),
+                ),
+              ],
+            ),
+          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: nextCard, // Press to go to next card
-        child: Icon(Icons.navigate_next),
       ),
     );
   }

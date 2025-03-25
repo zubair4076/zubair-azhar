@@ -1,0 +1,3 @@
+adb tcpip 5555
+adb connect 100.110.208.78:5555
+
