@@ -1,8 +1,75 @@
 import 'package:flutter/material.dart';
-import 'package:mid_project/widgets//custom_button.dart';
+import 'package:mid_project/widgets/custom_button.dart';
+import 'true_false_screen.dart';
+import 'input_question_screen.dart';
 
-class TrainingScreen extends StatelessWidget {
+class TrainingScreen extends StatefulWidget {
   const TrainingScreen({super.key});
+
+  @override
+  _TrainingScreenState createState() => _TrainingScreenState();
+}
+
+class _TrainingScreenState extends State<TrainingScreen> {
+  int _minNumber = 1;
+  int _maxNumber = 10;
+  String _selectedGameType = 'Test';
+  final TextEditingController _minController = TextEditingController();
+  final TextEditingController _maxController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _minController.text = _minNumber.toString();
+    _maxController.text = _maxNumber.toString();
+  }
+
+  @override
+  void dispose() {
+    _minController.dispose();
+    _maxController.dispose();
+    super.dispose();
+  }
+
+  void _updateMinNumber(String value) {
+    final number = int.tryParse(value) ?? _minNumber;
+    setState(() {
+      _minNumber = number.clamp(0, 1000);
+      if (_minNumber > _maxNumber) {
+        _maxNumber = _minNumber;
+        _maxController.text = _maxNumber.toString();
+      }
+    });
+  }
+
+  void _updateMaxNumber(String value) {
+    final number = int.tryParse(value) ?? _maxNumber;
+    setState(() {
+      _maxNumber = number.clamp(_minNumber, 1000);
+    });
+  }
+
+  void _startTraining() {
+    if (_selectedGameType == 'True / False') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TrueFalseScreen(maxNumber: _maxNumber),
+        ),
+      );
+    } else if (_selectedGameType == 'Input') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => InputQuestionScreen(maxNumber: _maxNumber),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selected game type is not implemented yet')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +103,31 @@ class TrainingScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildNumberSelector('1'),
+                SizedBox(
+                  width: 80,
+                  child: TextField(
+                    controller: _minController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: _updateMinNumber,
+                    onSubmitted: _updateMinNumber,
+                  ),
+                ),
                 const Text('-'),
-                _buildNumberSelector('10'),
+                SizedBox(
+                  width: 80,
+                  child: TextField(
+                    controller: _maxController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: _updateMaxNumber,
+                    onSubmitted: _updateMaxNumber,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 30),
@@ -66,9 +155,7 @@ class TrainingScreen extends StatelessWidget {
               child: CustomButton(
                 icon: Icons.play_arrow,
                 label: 'START',
-                onPressed: () {
-                  // Start training
-                },
+                onPressed: _startTraining,
                 width: 200,
               ),
             ),
@@ -78,35 +165,26 @@ class TrainingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNumberSelector(String number) {
-    return Container(
-      width: 80,
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Text(
-          number,
-          style: const TextStyle(fontSize: 18),
-        ),
-      ),
-    );
-  }
-
   Widget _buildGameTypeButton(String type) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
+        backgroundColor: _selectedGameType == type ? Colors.blue : null,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
       onPressed: () {
-        // Select game type
+        setState(() {
+          _selectedGameType = type;
+        });
       },
-      child: Text(type),
+      child: Text(
+        type,
+        style: TextStyle(
+          color: _selectedGameType == type ? Colors.white : null,
+        ),
+      ),
     );
   }
 }

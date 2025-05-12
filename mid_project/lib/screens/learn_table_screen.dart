@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mid_project/widgets/custom_button.dart';
+import 'package:mid_project/screens/multiplication_table_screen.dart';
 
 class LearnTableScreen extends StatelessWidget {
   const LearnTableScreen({super.key});
@@ -19,11 +19,11 @@ class LearnTableScreen extends StatelessWidget {
         child: Column(
           children: [
             // First row of multiplication options
-            _buildTableRow(['x1', 'x2', 'x3']),
+            _buildTableRow(['x1', 'x2', 'x3'], context),
             const SizedBox(height: 16),
 
             // Second row of multiplication options
-            _buildTableRow(['x4', 'x5', 'x6']),
+            _buildTableRow(['x4', 'x5', 'x6'], context),
             const SizedBox(height: 16),
 
             // Google Play and Puzzle buttons
@@ -43,29 +43,32 @@ class LearnTableScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Third row of multiplication options
-            _buildTableRow(['x7', 'x8', 'x9']),
+            _buildTableRow(['x7', 'x8', 'x9'], context),
             const SizedBox(height: 16),
 
             // Fourth row of multiplication options
-            _buildTableRow(['x10', 'x11', 'x12']),
+            _buildTableRow(['x10', 'x11', 'x12'], context),
             const SizedBox(height: 16),
 
             // Fifth row of multiplication options
-            _buildTableRow(['x13', 'x14', 'x15']),
+            _buildTableRow(['x13', 'x14', 'x15'], context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTableRow(List<String> tables) {
+  Widget _buildTableRow(List<String> tables, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: tables.map((table) => _buildTableOption(table)).toList(),
+      children: tables.map((table) => _buildTableOption(table, context)).toList(),
     );
   }
 
-  Widget _buildTableOption(String table) {
+  // Update in learn_table_screen.dart
+  Widget _buildTableOption(String table, BuildContext context) {
+    final tableNumber = int.parse(table.substring(1)); // Extract number from "x1", "x2", etc.
+
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(80, 80),
@@ -74,7 +77,12 @@ class LearnTableScreen extends StatelessWidget {
         ),
       ),
       onPressed: () {
-        // Navigate to the specific multiplication table
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MultiplicationTableScreen(tableNumber: tableNumber),
+          ),
+        );
       },
       child: Text(
         table,

@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mid_project/widgets/custom_button.dart';
+import 'true_false_screen.dart';
 
-class TestScreen extends StatelessWidget {
+class TestScreen extends StatefulWidget {
   const TestScreen({super.key});
+
+  @override
+  _TestScreenState createState() => _TestScreenState();
+}
+
+class _TestScreenState extends State<TestScreen> {
+  String _selectedComplexity = 'Easy';
+  int _maxNumber = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -68,12 +77,33 @@ class TestScreen extends StatelessWidget {
               icon: Icons.play_arrow,
               label: 'START TEST',
               onPressed: () {
-                // Start the test
+                _startTest();
               },
               width: 200,
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _startTest() {
+    switch (_selectedComplexity) {
+      case 'Easy':
+        _maxNumber = 10;
+        break;
+      case 'Middle':
+        _maxNumber = 50;
+        break;
+      case 'Hard':
+        _maxNumber = 100;
+        break;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TrueFalseScreen(maxNumber: _maxNumber),
       ),
     );
   }
@@ -117,15 +147,23 @@ class TestScreen extends StatelessWidget {
   Widget _buildComplexityOption(String level) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
+        backgroundColor: _selectedComplexity == level ? Colors.blue : null,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
       onPressed: () {
-        // Set test complexity
+        setState(() {
+          _selectedComplexity = level;
+        });
       },
-      child: Text(level),
+      child: Text(
+        level,
+        style: TextStyle(
+          color: _selectedComplexity == level ? Colors.white : null,
+        ),
+      ),
     );
   }
 }
